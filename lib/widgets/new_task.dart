@@ -71,8 +71,8 @@ class _NewTaskFormState extends State<NewTaskForm> {
                 labelText: "Enter a Task Description (optional)"),
             controller: _taskDescription,
           ),
-          SizedBox(height: 20,),
-          Text("Duration:"),
+          const SizedBox(height: 20,),
+          const Text("Duration:"),
           TextFormField(
             decoration: const InputDecoration(
               border: UnderlineInputBorder(),

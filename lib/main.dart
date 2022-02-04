@@ -13,9 +13,9 @@ enum status {
   todo,
   inProgress,
   completed,
-}
+} // Defines the status for individual tasks.
 
-bool globalView = false;
+bool globalView = false; // Checker for Listview vs. Globalview
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -28,7 +28,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
+      title: 'ToDo App',
       theme: ThemeData(
         primarySwatch: Colors.indigo,
       ),
@@ -42,16 +42,14 @@ class MyHomePage extends StatefulWidget {
 
   final String title;
 
-
   @override
   State<MyHomePage> createState() => _MyHomePageState();
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-
   resetScreen() {
     setState(() {});
-  }
+  } //This function can be passed to child widgets to setState for parent widget
 
   @override
   Widget build(BuildContext context) {
@@ -76,24 +74,29 @@ class _MyHomePageState extends State<MyHomePage> {
                 if (snapshot.data.toString() != '[]') {
                   var tasks = snapshot.data as List<Task>;
                   var allCards = <Widget>[];
-                  if (!globalView){
-                    for (var element in tasks){
-                      allCards.add(TaskCard(task: element, delete: resetScreen));
+                  if (!globalView) {
+                    for (var element in tasks) {
+                      allCards
+                          .add(TaskCard(task: element, delete: resetScreen));
                     }
                     return ListView(
                       shrinkWrap: true,
                       physics: const BouncingScrollPhysics(),
                       children: allCards,
                     );
-                  }else{
-                    for (var element in tasks){
-                      allCards.add(TaskGrid(task: element, delete: resetScreen,));
+                  } else {
+                    for (var element in tasks) {
+                      allCards.add(TaskGrid(
+                        task: element,
+                        delete: resetScreen,
+                      ));
                     }
                     return GridView.count(
                       shrinkWrap: true,
                       crossAxisCount: 2,
                       children: allCards,
-                      childAspectRatio: 1/1.2,
+                      childAspectRatio: 1 /
+                          1.2, //This is to fit all the information within the card.
                     );
                   }
                 } else {
@@ -115,14 +118,12 @@ class _MyHomePageState extends State<MyHomePage> {
               context: context, builder: (context) => const NewTask());
           setState(() {});
         },
-        tooltip: 'Increment',
+        tooltip: 'Create New Task',
         child: const Icon(Icons.add),
       ),
     );
   }
 }
-
-
 
 Future<Database> connectToDataBase() async {
   final database = openDatabase(
@@ -134,7 +135,7 @@ Future<Database> connectToDataBase() async {
     version: 1,
   );
   return database;
-}
+} // A function that sets up connection to database.
 
 Future<void> createTask(
     String title, String? description, String minutes, String seconds) async {
@@ -151,7 +152,7 @@ Future<void> createTask(
     task.toMap(),
     conflictAlgorithm: ConflictAlgorithm.replace,
   );
-}
+} // Stores a newly created task in the database.
 
 int timeConverterToInt(String minutes, String seconds) {
   if (int.parse(minutes) == 0) {
@@ -164,7 +165,7 @@ int timeConverterToInt(String minutes, String seconds) {
     int sec = int.parse(seconds);
     return min + sec;
   }
-}
+} //This is to keep duration as a single total seconds time unit so that the synchronization is kept.
 
 Future<void> updateTask(Task task) async {
   final db = await connectToDataBase();
@@ -174,7 +175,7 @@ Future<void> updateTask(Task task) async {
     where: 'id = ?',
     whereArgs: [task.id],
   );
-}
+} // So that new timer counts can be updated.
 
 Future<List<Task>> getTasks() async {
   final db = await connectToDataBase();
@@ -187,7 +188,7 @@ Future<List<Task>> getTasks() async {
         duration: tasks[i]['duration'],
         completed: tasks[i]['completed']);
   });
-}
+}  // Gets data from the table in database
 
 showPickerArray(BuildContext context, TextEditingController minuteController,
     TextEditingController secondController) {
@@ -218,23 +219,20 @@ showPickerArray(BuildContext context, TextEditingController minuteController,
             Navigator.pop(context);
           },
           child: const Text("Cancel")),
-
       onConfirm: (Picker picker, List value) {
         var minutes = picker.getSelectedValues()[0];
         var seconds = picker.getSelectedValues()[1];
         minuteController.text = minutes.toString();
         secondController.text = seconds.toString();
       }).showDialog(context);
-}
-
-
+}// Helps pick timer
 
 Future<int> getLast() async {
   final db = await connectToDataBase();
   final List<Map<String, dynamic>> tasks = await db.query('tasks');
   int len = tasks.length;
   return len + 1;
-}
+} //Gets the ID for the next Task
 
 List<int> secondToMins(int seconds) {
   if (seconds < 60) {
@@ -242,4 +240,4 @@ List<int> secondToMins(int seconds) {
   } else {
     return [seconds ~/ 60, seconds % 60];
   }
-}
+} // duration split
